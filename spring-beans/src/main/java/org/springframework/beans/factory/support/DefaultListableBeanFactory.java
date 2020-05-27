@@ -111,6 +111,9 @@ import org.springframework.util.StringUtils;
  * @see #addBeanPostProcessor
  * @see #getBean
  * @see #resolveDependency
+ *
+ * 是我们经常用到的一个IoC容器的实现，比如在设计应用上下问ApplicationContext时就会用到它，
+ * 它实际上包含了基本IoC容器所具有的重要功能。
  */
 @SuppressWarnings("serial")
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory

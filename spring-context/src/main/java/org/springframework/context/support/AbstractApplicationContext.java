@@ -504,6 +504,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+	/**
+	 * BeanDefinition的Resource定位、载入和注册操作
+	 * IoC容器内部的数据结构就是BeanDefinition，BeanDefinition其实就是POJO对象在IoC容器中的抽象
+	 * IoC容器内部其实是将BeanDefinition注入到一个HashMap中，IoC就是通过HashMap来持有这些BeanDefinition数据的。
+	 * @throws BeansException
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
@@ -1239,6 +1246,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Return the internal bean factory of the parent context if it implements
 	 * ConfigurableApplicationContext; else, return the parent context itself.
 	 * @see org.springframework.context.ConfigurableApplicationContext#getBeanFactory
+	 * 根据容器已有的双亲IoC容器信息生成DefaultListableBeanFactory的双亲IoC容器
 	 */
 	protected BeanFactory getInternalParentBeanFactory() {
 		return (getParent() instanceof ConfigurableApplicationContext) ?

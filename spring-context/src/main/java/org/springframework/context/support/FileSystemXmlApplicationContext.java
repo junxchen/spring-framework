@@ -101,6 +101,8 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * @param configLocations array of file paths
 	 * @param parent the parent context
 	 * @throws BeansException if context creation failed
+	 *
+	 * 允许configLocations包含多个BeanDefinition的文件路径的同时，还允许指定自己的双亲IoC容器
 	 */
 	public FileSystemXmlApplicationContext(String[] configLocations, ApplicationContext parent) throws BeansException {
 		this(configLocations, true, parent);
@@ -136,6 +138,7 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 
 		super(parent);
 		setConfigLocations(configLocations);
+		// 	调用refresh方法载入BeanDefinition，IoC容器初始化过程
 		if (refresh) {
 			refresh();
 		}
@@ -150,6 +153,10 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * @param path path to the resource
 	 * @return Resource handle
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext#getResourceByPath
+	 *
+	 * 从文件系统中读取以XML形式存在的BeanDefinition
+	 *
+	 * 重写父类DefaultResourceLoader#getResourceByPath方法
 	 */
 	@Override
 	protected Resource getResourceByPath(String path) {

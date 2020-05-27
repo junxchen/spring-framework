@@ -49,6 +49,8 @@ import org.springframework.core.io.Resource;
  * @see XmlBeanDefinitionReader
  * @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
  * {@link XmlBeanDefinitionReader}
+ *
+ * 读取XML文件方式定义的BeanDefinition的IoC容器，实际上处理是使用XmlBeanDefinitionReader来处理的。
  */
 @Deprecated
 @SuppressWarnings({"serial", "all"})

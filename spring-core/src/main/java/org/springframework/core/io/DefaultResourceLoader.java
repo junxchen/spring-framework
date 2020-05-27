@@ -127,16 +127,19 @@ public class DefaultResourceLoader implements ResourceLoader {
 			return getResourceByPath(location);
 		}
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
+			// 处理带有classpath标识的Resource
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
 				// Try to parse the location as a URL...
+				// 处理URL标识的Resource定位
 				URL url = new URL(location);
 				return new UrlResource(url);
 			}
 			catch (MalformedURLException ex) {
 				// No URL -> resolve as resource path.
+				// 非classpath、URL、/打头的交给getResourceByPath()处理
 				return getResourceByPath(location);
 			}
 		}
