@@ -296,6 +296,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		Object propValue = getPropertyHoldingValue(tokens);
 		String lastKey = tokens.keys[tokens.keys.length - 1];
 
+		// 读Array进行注入
 		if (propValue.getClass().isArray()) {
 			PropertyHandler ph = getLocalPropertyHandler(tokens.actualName);
 			Class<?> requiredType = propValue.getClass().getComponentType();
