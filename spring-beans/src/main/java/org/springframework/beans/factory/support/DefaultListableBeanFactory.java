@@ -164,6 +164,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<Class<?>, Object>(16);
 
 	/** Map of bean definition objects, keyed by bean name */
+	/** IoC容器的数据维护其实就是一个Map*/
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(256);
 
 	/** Map of singleton and non-singleton bean names, keyed by dependency type */
@@ -806,6 +807,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
 		if (existingDefinition != null) {
+			// 相同名字的 BeanDefinition已经在IoC容器注册了，不允许覆盖的话，直接抛出异常
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
 						"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
@@ -838,6 +840,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		else {
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
+				// 保证数据一致性
 				synchronized (this.beanDefinitionMap) {
 					this.beanDefinitionMap.put(beanName, beanDefinition);
 					List<String> updatedDefinitions = new ArrayList<String>(this.beanDefinitionNames.size() + 1);
