@@ -178,12 +178,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean enforceDestroyMethod = true;
 
+	/** 是否是合成类，创建AOP时会为true*/
 	private boolean synthetic = false;
 
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
 	private String description;
 
+	/** Bean来源于哪里*/
 	private Resource resource;
 
 

@@ -52,6 +52,8 @@ package org.springframework.beans.factory;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
+ *
+ * 工厂类接口，用户可以通过实现该接口定制实例化bean的逻辑
  */
 public interface FactoryBean<T> {
 
@@ -71,6 +73,8 @@ public interface FactoryBean<T> {
 	 * @return an instance of the bean (can be {@code null})
 	 * @throws Exception in case of creation errors
 	 * @see FactoryBeanNotInitializedException
+	 *
+	 * 返回由FactoryBean创建的Bean实例,如果isSingleton返回true,则该实例会放到spring容器中单例缓存池中
 	 */
 	T getObject() throws Exception;
 
@@ -92,6 +96,8 @@ public interface FactoryBean<T> {
 	 * @return the type of object that this FactoryBean creates,
 	 * or {@code null} if not known at the time of the call
 	 * @see ListableBeanFactory#getBeansOfType
+	 *
+	 * 返回FactoryBean创建的bean类型
 	 */
 	Class<?> getObjectType();
 
@@ -117,6 +123,8 @@ public interface FactoryBean<T> {
 	 * @return whether the exposed object is a singleton
 	 * @see #getObject()
 	 * @see SmartFactoryBean#isPrototype()
+	 *
+	 * 返回由FactoryBean创建的bean实例的作用域是singleton还是prototype
 	 */
 	boolean isSingleton();
 

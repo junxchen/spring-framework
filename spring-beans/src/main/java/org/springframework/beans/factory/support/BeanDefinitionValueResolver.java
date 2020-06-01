@@ -103,6 +103,7 @@ class BeanDefinitionValueResolver {
 	public Object resolveValueIfNecessary(Object argName, Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
+		// RuntimeBeanReference是在载入BeanDefinition时根据配置生成的
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			return resolveReference(argName, ref);
@@ -180,9 +181,18 @@ class BeanDefinitionValueResolver {
 			}
 			return copy;
 		}
+		// Map、List、Array 最后底层循环String类型的值都会触发这里返回对应的值
+		// <property name="someList">
+		//			<list>
+		//				<value>11</value>
+		//				<value>11</value>
+		//				<value>11</value>
+		//			</list>
+		//		</property>
 		else if (value instanceof TypedStringValue) {
 			// Convert value to target type here.
 			TypedStringValue typedStringValue = (TypedStringValue) value;
+			// 获取值
 			Object valueObject = evaluate(typedStringValue);
 			try {
 				Class<?> resolvedTargetType = resolveTargetType(typedStringValue);
@@ -349,6 +359,7 @@ class BeanDefinitionValueResolver {
 				}
 				return this.beanFactory.getParentBeanFactory().getBean(refName);
 			}
+			// 在当前IoC容器中取得Bean，这里会触发getBean的过程，如果依赖注入没有发生，这里会触发相应的依赖注入
 			else {
 				Object bean = this.beanFactory.getBean(refName);
 				this.beanFactory.registerDependentBean(refName, this.beanName);
@@ -403,11 +414,16 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * For each element in the managed map, resolve reference if necessary.
+	 *
+	 * mm -> ManagedMap
 	 */
 	private Map<?, ?> resolveManagedMap(Object argName, Map<?, ?> mm) {
 		Map<Object, Object> resolved = new LinkedHashMap<Object, Object>(mm.size());
 		for (Map.Entry<?, ?> entry : mm.entrySet()) {
+			// entry.getKey()类型为TypedStringValue，递归调用resolveValueIfNecessary 然后走 else if (value instanceof TypedStringValue) 逻辑代码块
+			// 获取map的键
 			Object resolvedKey = resolveValueIfNecessary(argName, entry.getKey());
+			// 获取map的值
 			Object resolvedValue = resolveValueIfNecessary(
 					new KeyedArgName(argName, entry.getKey()), entry.getValue());
 			resolved.put(resolvedKey, resolvedValue);

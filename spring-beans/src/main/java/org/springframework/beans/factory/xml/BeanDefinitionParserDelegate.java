@@ -900,6 +900,7 @@ public class BeanDefinitionParserDelegate {
 				error("Multiple 'property' definitions for property '" + propertyName + "'", ele);
 				return;
 			}
+			// 解析property 返回相应的TypedStringValue、ManagedList等
 			Object val = parsePropertyValue(ele, bd, propertyName);
 			PropertyValue pv = new PropertyValue(propertyName, val);
 			parseMetaElements(ele, pv);
@@ -1004,7 +1005,14 @@ public class BeanDefinitionParserDelegate {
 			valueHolder.setSource(extractSource(ele));
 			return valueHolder;
 		}
-		// 如果有子元素，对子元素的解析
+		// 如果有子元素，对子元素的解析，涉及Map、List、Array等
+		// <property name="someMap">
+		//			<map>
+		//				<entry key="11" value="11"/>
+		//				<entry key="22" value="22"/>
+		//				<entry key="33" value="33"/>
+		//			</map>
+		//		</property>
 		else if (subElement != null) {
 			return parsePropertySubElement(subElement, bd);
 		}
@@ -1222,9 +1230,11 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a map element.
 	 */
 	public Map<Object, Object> parseMapElement(Element mapEle, BeanDefinition bd) {
+		// 获取Map类型的key-type、value-type 没有写，默认为""
 		String defaultKeyType = mapEle.getAttribute(KEY_TYPE_ATTRIBUTE);
 		String defaultValueType = mapEle.getAttribute(VALUE_TYPE_ATTRIBUTE);
 
+		// map对应的 子节点 entryEles
 		List<Element> entryEles = DomUtils.getChildElementsByTagName(mapEle, ENTRY_ELEMENT);
 		ManagedMap<Object, Object> map = new ManagedMap<Object, Object>(entryEles.size());
 		map.setSource(extractSource(mapEle));
@@ -1232,9 +1242,18 @@ public class BeanDefinitionParserDelegate {
 		map.setValueTypeName(defaultValueType);
 		map.setMergeEnabled(parseMergeAttribute(mapEle));
 
+		// map对应的 子节点 entryEles
 		for (Element entryEle : entryEles) {
 			// Should only have one value child element: ref, value, list, etc.
 			// Optionally, there might be a key child element.
+			//<property name="someMap">
+			//			<map>
+			//				<entry key="11" value="11"/>
+			//				<entry key="22" value="22"/>
+			//				<entry key="33" value="33"/>
+			//			</map>
+			//		</property>
+			// 子节点对应的子节点  entry下的子节点不存在
 			NodeList entrySubNodes = entryEle.getChildNodes();
 			Element keyEle = null;
 			Element valueEle = null;
@@ -1267,7 +1286,9 @@ public class BeanDefinitionParserDelegate {
 
 			// Extract key from attribute or sub-element.
 			Object key = null;
+			// entry是否是key
 			boolean hasKeyAttribute = entryEle.hasAttribute(KEY_ATTRIBUTE);
+			// entry是否是ref
 			boolean hasKeyRefAttribute = entryEle.hasAttribute(KEY_REF_ATTRIBUTE);
 			if ((hasKeyAttribute && hasKeyRefAttribute) ||
 					(hasKeyAttribute || hasKeyRefAttribute) && keyEle != null) {
@@ -1295,6 +1316,7 @@ public class BeanDefinitionParserDelegate {
 
 			// Extract value from attribute or sub-element.
 			Object value = null;
+			// value Extract 值提取
 			boolean hasValueAttribute = entryEle.hasAttribute(VALUE_ATTRIBUTE);
 			boolean hasValueRefAttribute = entryEle.hasAttribute(VALUE_REF_ATTRIBUTE);
 			boolean hasValueTypeAttribute = entryEle.hasAttribute(VALUE_TYPE_ATTRIBUTE);

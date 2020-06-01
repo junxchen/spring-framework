@@ -4,7 +4,35 @@
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="a" class="java.lang.Object" />
+
+	<bean id="myTestBean" class="org.springframework.tests.sample.beans.MyTestBean">
+		<property name="beanName"><value>MyTestBean</value></property>
+		<property name="someMap">
+			<map>
+				<entry key="11" value="11"/>
+				<entry key="22" value="22"/>
+				<entry key="33" value="33"/>
+			</map>
+		</property>
+		<property name="someList">
+			<list>
+				<value>11</value>
+				<value>11</value>
+				<value>11</value>
+			</list>
+		</property>
+		<property name="stringArray">
+			<list>
+				<value>1</value>
+				<value>2</value>
+				<value>3</value>
+			</list>
+		</property>
+	</bean>
+
+
+
+	<!--<bean id="a" class="java.lang.Object" />
 
 	<bean id="b" class="java.lang.Integer">
 		<constructor-arg value="50" />
@@ -35,6 +63,6 @@
 
 	<bean id="secondBuffer" class="java.lang.StringBuffer">
 		<constructor-arg ref="field"/>
-	</bean>
+	</bean>-->
 
 </beans>

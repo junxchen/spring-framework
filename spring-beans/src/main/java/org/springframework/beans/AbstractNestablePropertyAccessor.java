@@ -293,6 +293,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	@SuppressWarnings("unchecked")
 	private void processKeyedProperty(PropertyTokenHolder tokens, PropertyValue pv) {
+		// Bean中对注入对象的引用，比如Array、List、Map、Set等
 		Object propValue = getPropertyHoldingValue(tokens);
 		String lastKey = tokens.keys[tokens.keys.length - 1];
 
@@ -397,6 +398,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		System.arraycopy(tokens.keys, 0, getterTokens.keys, 0, tokens.keys.length - 1);
 
 		Object propValue;
+		// getPropertyValue 取得Bean中对注入对象的引用，比如Array、List、Map、Set等
 		try {
 			propValue = getPropertyValue(getterTokens);
 		}

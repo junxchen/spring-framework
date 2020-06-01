@@ -41,6 +41,8 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @see GenericBeanDefinition
  * @see RootBeanDefinition
+ *
+ * 不可以单独存在，必须依赖一个父BeanDefinition 它的parentName属性是通过构造方法设置,并没有提供一个无参构造方法给我们
  */
 @SuppressWarnings("serial")
 public class ChildBeanDefinition extends AbstractBeanDefinition {

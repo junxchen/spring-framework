@@ -46,18 +46,22 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @see GenericBeanDefinition
  * @see ChildBeanDefinition
+ *
+ * 不能作为其他BeanDefinition的子类，在setParentName 会抛出异常
  */
 @SuppressWarnings("serial")
 public class RootBeanDefinition extends AbstractBeanDefinition {
 
+	/** 存储有Bean的名称、别名、BeanDefinition*/
 	private BeanDefinitionHolder decoratedDefinition;
 
+	/** java反射包的接口，可以通过它查看Bean的注解信息*/
 	private AnnotatedElement qualifiedElement;
 
 	boolean allowCaching = true;
 
 	boolean isFactoryMethodUnique = false;
-
+	/** 封装了java.lang.reflect.Type,提供了泛型相关的操作*/
 	volatile ResolvableType targetType;
 
 	/** Package-visible field for caching the determined Class of a given bean definition */
