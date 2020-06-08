@@ -77,6 +77,13 @@ public class NameMatchMethodPointcut extends StaticMethodMatcherPointcut impleme
 	}
 
 
+	/**
+	 * 方法名相同或者方法名相匹配
+	 * @param method the candidate method
+	 * @param targetClass the target class (may be {@code null}, in which case
+	 * the candidate class must be taken to be the method's declaring class)
+	 * @return
+	 */
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
 		for (String mappedName : this.mappedNames) {

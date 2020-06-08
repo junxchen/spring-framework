@@ -106,12 +106,16 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		List<Element> childElts = DomUtils.getChildElements(element);
 		for (Element elt: childElts) {
 			String localName = parserContext.getDelegate().getLocalName(elt);
+			// pointcut <aop:pointcut>
 			if (POINTCUT.equals(localName)) {
 				parsePointcut(elt, parserContext);
 			}
+			// advisor <aop:advisor>
 			else if (ADVISOR.equals(localName)) {
 				parseAdvisor(elt, parserContext);
 			}
+			// aspect <aop:aspect>
+
 			else if (ASPECT.equals(localName)) {
 				parseAspect(elt, parserContext);
 			}
@@ -194,12 +198,28 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	}
 
 	private void parseAspect(Element aspectElement, ParserContext parserContext) {
+
+		//<aop:config>
+		//		<aop:aspect id="countAgeCalls" ref="countingAdvice">
+		//			<aop:pointcut id="pc" expression="execution(* getAge())"/>
+		//			<aop:before pointcut-ref="pc" method="myBeforeAdvice" />
+		//			<aop:after pointcut-ref="pc" method="myAfterAdvice" />
+		//			<aop:after-returning pointcut-ref="pc" method="myAfterReturningAdvice" returning="age"/>
+		//			<aop:after-throwing pointcut-ref="pc" method="myAfterThrowingAdvice" throwing="ex"/>
+		//			<aop:around pointcut-ref="pc" method="myAroundAdvice"/>
+		//		</aop:aspect>
+		//	</aop:config>
+
+		// 获取定义的切面ID和ref
 		String aspectId = aspectElement.getAttribute(ID);
 		String aspectName = aspectElement.getAttribute(REF);
 
 		try {
+			// 将获取到的切面ID和ref封装到AspectEntry这个类中
 			this.parseState.push(new AspectEntry(aspectId, aspectName));
+			// 把<aop:before>等通知相关的信息封装到AspectJPointcutAdvisor中，然后放到该集合里
 			List<BeanDefinition> beanDefinitions = new ArrayList<BeanDefinition>();
+			// 把ref相关的信息等封装到RunTimeBeanReference中，然后放到这个集合中
 			List<BeanReference> beanReferences = new ArrayList<BeanReference>();
 
 			List<Element> declareParents = DomUtils.getChildElementsByTagName(aspectElement, DECLARE_PARENTS);
@@ -214,6 +234,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			boolean adviceFoundAlready = false;
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
+				// 是Advice
 				if (isAdviceNode(node, parserContext)) {
 					if (!adviceFoundAlready) {
 						adviceFoundAlready = true;
@@ -223,18 +244,22 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 									aspectElement, this.parseState.snapshot());
 							return;
 						}
+						// 封装ref信息
 						beanReferences.add(new RuntimeBeanReference(aspectName));
 					}
+					// 把通知相关信息封装到AspectJPointcutAdvisor这个类中，同时封装ref信息然后放到BeanReferences中
 					AbstractBeanDefinition advisorDefinition = parseAdvice(
 							aspectName, i, aspectElement, (Element) node, parserContext, beanDefinitions, beanReferences);
 					beanDefinitions.add(advisorDefinition);
 				}
 			}
 
+			// 把切面信息和通知信息封装到这个类中
 			AspectComponentDefinition aspectComponentDefinition = createAspectComponentDefinition(
 					aspectElement, aspectId, beanDefinitions, beanReferences, parserContext);
 			parserContext.pushContainingComponent(aspectComponentDefinition);
 
+			// 解析切入点，然后封装信息
 			List<Element> pointcuts = DomUtils.getChildElementsByTagName(aspectElement, POINTCUT);
 			for (Element pointcutElement : pointcuts) {
 				parsePointcut(pointcutElement, parserContext);

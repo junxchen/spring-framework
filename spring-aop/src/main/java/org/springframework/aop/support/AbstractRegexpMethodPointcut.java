@@ -142,6 +142,7 @@ public abstract class AbstractRegexpMethodPointcut extends StaticMethodMatcherPo
 	 */
 	protected boolean matchesPattern(String signatureString) {
 		for (int i = 0; i < this.patterns.length; i++) {
+			// 调用JdkRegexpMethodPointcut#matches
 			boolean matched = matches(signatureString, i);
 			if (matched) {
 				for (int j = 0; j < this.excludedPatterns.length; j++) {

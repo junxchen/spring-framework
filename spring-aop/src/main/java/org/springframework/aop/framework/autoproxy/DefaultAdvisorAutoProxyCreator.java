@@ -33,6 +33,8 @@ import org.springframework.beans.factory.BeanNameAware;
  *
  * @author Rod Johnson
  * @author Rob Harrop
+ *
+ * 基于Advisor匹配机制的自动代理创建器，对容器中所有的Advisor进行扫描，自动将这些切面应用到匹配的Bean中（即为目标Bean创建代理实例）
  */
 @SuppressWarnings("serial")
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator implements BeanNameAware {

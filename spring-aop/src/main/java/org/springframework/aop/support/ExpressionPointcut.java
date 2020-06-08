@@ -23,6 +23,8 @@ import org.springframework.aop.Pointcut;
  *
  * @author Rob Harrop
  * @since 2.0
+ *
+ * 表达式切点类型 通过表达式匹配，用于支持AspectJ的表达式
  */
 public interface ExpressionPointcut extends Pointcut {
 

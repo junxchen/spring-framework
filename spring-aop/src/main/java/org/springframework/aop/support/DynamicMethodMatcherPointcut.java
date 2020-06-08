@@ -27,6 +27,7 @@ import org.springframework.aop.Pointcut;
  * be overridden to customize ClassFilter behaviour as well.
  *
  * @author Rod Johnson
+ * 动态方法切点类型
  */
 public abstract class DynamicMethodMatcherPointcut extends DynamicMethodMatcher implements Pointcut {
 

@@ -29,6 +29,8 @@ import org.springframework.aop.Pointcut;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ *
+ * 静态方法切点 默认匹配所有类
  */
 public abstract class StaticMethodMatcherPointcut extends StaticMethodMatcher implements Pointcut {
 

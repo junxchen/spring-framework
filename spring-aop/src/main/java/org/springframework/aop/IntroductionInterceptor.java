@@ -28,6 +28,8 @@ import org.aopalliance.intercept.MethodInterceptor;
  *
  * @author Rod Johnson
  * @see DynamicIntroductionAdvice
+ *
+ * AOP增强或通知的一种类型：引介
  */
 public interface IntroductionInterceptor extends MethodInterceptor, DynamicIntroductionAdvice {
 

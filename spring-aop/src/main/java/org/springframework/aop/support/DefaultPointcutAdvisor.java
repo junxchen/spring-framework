@@ -33,10 +33,13 @@ import org.springframework.aop.Pointcut;
  * @author Juergen Hoeller
  * @see #setPointcut
  * @see #setAdvice
+ *
+ * 最常用的切面类型，它可以通过任意Pointcut和Advice定义一个切面，唯一不支持的是引介的切面类型，一般可以通过扩展该类实现自定义的切面
  */
 @SuppressWarnings("serial")
 public class DefaultPointcutAdvisor extends AbstractGenericPointcutAdvisor implements Serializable {
 
+	/** 切点  AbstractGenericPointcutAdvisor 父类有个Advice 增强设计*/
 	private Pointcut pointcut = Pointcut.TRUE;
 
 

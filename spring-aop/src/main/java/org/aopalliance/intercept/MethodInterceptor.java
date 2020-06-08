@@ -38,6 +38,8 @@ package org.aopalliance.intercept;
  * </pre>
  *
  * @author Rod Johnson
+ *
+ * AOP增强或通知的一种类型：环绕
  */
 public interface MethodInterceptor extends Interceptor {
 	

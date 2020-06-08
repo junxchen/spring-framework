@@ -53,19 +53,29 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 	}
 
 
+	/**
+	 * 将Advice包装成Advisor
+	 * @param adviceObject
+	 * @return
+	 * @throws UnknownAdviceTypeException
+	 */
 	@Override
 	public Advisor wrap(Object adviceObject) throws UnknownAdviceTypeException {
+		// 如果指定的类型已经是通知器，直接返回
 		if (adviceObject instanceof Advisor) {
 			return (Advisor) adviceObject;
 		}
+		// 如果指定的类型不是Advice类型，直接抛出异常
 		if (!(adviceObject instanceof Advice)) {
 			throw new UnknownAdviceTypeException(adviceObject);
 		}
 		Advice advice = (Advice) adviceObject;
 		if (advice instanceof MethodInterceptor) {
 			// So well-known it doesn't even need an adapter.
+			// 直接返回默认的切点通知器
 			return new DefaultPointcutAdvisor(advice);
 		}
+		// 否则使用注册的Advisor适配器对Advice检查（可自定义）
 		for (AdvisorAdapter adapter : this.adapters) {
 			// Check that it is supported.
 			if (adapter.supportsAdvice(advice)) {
@@ -78,10 +88,13 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 	@Override
 	public MethodInterceptor[] getInterceptors(Advisor advisor) throws UnknownAdviceTypeException {
 		List<MethodInterceptor> interceptors = new ArrayList<MethodInterceptor>(3);
+		// 从Advisor通知器配置在获取advice通知
 		Advice advice = advisor.getAdvice();
+		// 如果是MethodInterceptor类型的通知，直接加到interceptors中
 		if (advice instanceof MethodInterceptor) {
 			interceptors.add((MethodInterceptor) advice);
 		}
+		// 对通知适配，使用已经配置好的Adapter获取封装好的AOP编织功能的拦截器
 		for (AdvisorAdapter adapter : this.adapters) {
 			if (adapter.supportsAdvice(advice)) {
 				interceptors.add(adapter.getInterceptor(advisor));

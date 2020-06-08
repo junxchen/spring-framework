@@ -36,6 +36,8 @@ import java.util.regex.PatternSyntaxException;
  * @author Dmitriy Kopylenko
  * @author Rob Harrop
  * @since 1.1
+ *
+ * 完成通过正则表达式对方法名进行匹配的功能
  */
 @SuppressWarnings("serial")
 public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
@@ -70,6 +72,8 @@ public class JdkRegexpMethodPointcut extends AbstractRegexpMethodPointcut {
 	/**
 	 * Returns {@code true} if the {@link Pattern} at index {@code patternIndex}
 	 * matches the supplied candidate {@code String}.
+	 *
+	 * {@link AbstractRegexpMethodPointcut} AbstractRegexpMethodPointcut#matches
 	 */
 	@Override
 	protected boolean matches(String pattern, int patternIndex) {

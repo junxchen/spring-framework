@@ -28,9 +28,18 @@ import org.aopalliance.aop.Advice;
  * <b>interception</b>, compliant with the AOP Alliance interception API.
  * The Advisor interface allows support for different types of advice,
  * such as <b>before</b> and <b>after</b> advice, which need not be
- * implemented using interception.
  *
  * @author Rod Johnson
+ *
+ * 完成对目标方法的切面增强设计(Advice)和关注点的设计(Pointcut)，
+ * 需要一个对象把它们结合起来，完成这个作用的就是Advisor(通知器)，
+ * 通过Advisor，可以定义应该使用哪个通知并在哪个关注点使用它
+ *
+ *
+ * 其实Spring中提供的增强MethodBeforeAdvice、AfterReturningAdvice等，也包含了连接点信息，就是一个切面，最终都会被AdvisorRegister转换成Advisor
+ * 所以说，Spring 中的Advisor就是横切面的抽象，包含切点和增强
+ *
+ * 多个Advisor  org.springframework.core.Ordered接口，来确定增强的顺序
  */
 public interface Advisor {
 

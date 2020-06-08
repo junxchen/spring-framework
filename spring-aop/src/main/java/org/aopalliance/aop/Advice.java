@@ -22,6 +22,13 @@ package org.aopalliance.aop;
  *
  * @author Rod Johnson
  * @version $Id: Advice.java,v 1.1 2004/03/19 17:02:16 johnsonr Exp $
+ *
+ * 定义在连接点做什么,目标方法的切面增强设计
+ *
+ * 切面由切点（pointcut）和增强（advice）组成，而advice中包含了增强的横切代码，pointcut包含了连接点的描述信息
+ *
+ * 其实Spring中提供的增强MethodBeforeAdvice、AfterReturningAdvice等，也包含了连接点信息，就是一个切面，最终都会被AdvisorRegister转换成Advisor
+ * 所以说，Spring 中的Advisor就是横切面的抽象，包含切点和增强
  */
 public interface Advice {
 

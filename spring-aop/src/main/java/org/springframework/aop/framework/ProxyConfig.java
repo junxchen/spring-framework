@@ -27,6 +27,8 @@ import org.springframework.util.Assert;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see AdvisedSupport
+ *
+ * 所有Spring AOP生成代理对象的基类，主要为其AOP代理对象工厂实现类提供配置属性
  */
 public class ProxyConfig implements Serializable {
 
@@ -34,6 +36,7 @@ public class ProxyConfig implements Serializable {
 	private static final long serialVersionUID = -8409359707199703185L;
 
 
+	/** 是否接口类， true说明要代理的不是接口类，而是CGLIB方式来进行代理*/
 	private boolean proxyTargetClass = false;
 
 	private boolean optimize = false;

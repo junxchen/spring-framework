@@ -56,6 +56,9 @@ import org.springframework.util.CollectionUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AopProxy
+ *
+ * 封装AOP中通用的对增强（Advice）和通知器（Advisor）的相关操作，
+ * 对于所有生成AOP代理对象都通用，而代理对象的生成由子类完成
  */
 public class AdvisedSupport extends ProxyConfig implements Advised {
 
@@ -485,6 +488,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);
 		if (cached == null) {
+			// advisorChainFactory is DefaultAdvisorChainFactory
 			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
 					this, method, targetClass);
 			this.methodCache.put(cacheKey, cached);

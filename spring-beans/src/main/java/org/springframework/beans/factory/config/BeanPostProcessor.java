@@ -38,6 +38,8 @@ import org.springframework.beans.BeansException;
  * @see DestructionAwareBeanPostProcessor
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
+ *
+ * 通过ProxyFactoryBean，生成targetClass的代理对象，从容器中获取使用，但是对于众多bean需要代理的情况下，就需要Spring的自动代理机制
  */
 public interface BeanPostProcessor {
 

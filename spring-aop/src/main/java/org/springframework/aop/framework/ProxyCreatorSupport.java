@@ -28,6 +28,12 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 2.0.3
  * @see #createAopProxy()
+ *
+ * AOP对象创建的辅助类，提供不同的AOP代理对象生成的通用方法，而代理对象的生成由其子类完成
+ * 实际创建AOP对象的类：
+ * @see org.springframework.aop.aspectj.annotation.AspectJProxyFactory  创建AspectJ的AOP对象，用于Spring集成AspectJ的作用
+ * @see ProxyFactory 创建编程式的AOP对象
+ * @see ProxyFactoryBean 创建声明式的AOP对象，通过配置创建AOP对象
  */
 @SuppressWarnings("serial")
 public class ProxyCreatorSupport extends AdvisedSupport {
@@ -102,6 +108,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		if (!this.active) {
 			activate();
 		}
+		// 通过AopProxyFactory取得AopProxy，这个AopProxyFactory是在初始化函数中定义的，使用的是DefaultAopProxyFactory
 		return getAopProxyFactory().createAopProxy(this);
 	}
 

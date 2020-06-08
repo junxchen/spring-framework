@@ -123,7 +123,7 @@ public class ThrowsAdviceInterceptor implements MethodInterceptor, AfterAdvice {
 
 	/**
 	 * Determine the exception handle method for the given exception.
-	 * @param exception the exception thrown
+	 * @param exception the exception thrownProxyConfig
 	 * @return a handler for the given exception type, or {@code null} if none found
 	 */
 	private Method getExceptionHandler(Throwable exception) {
@@ -142,6 +142,13 @@ public class ThrowsAdviceInterceptor implements MethodInterceptor, AfterAdvice {
 		return handler;
 	}
 
+	/**
+	 * 通过反射启动对ThrowsAdvice回调方法的调用
+	 * @param mi
+	 * @param ex
+	 * @param method
+	 * @throws Throwable
+	 */
 	private void invokeHandlerMethod(MethodInvocation mi, Throwable ex, Method method) throws Throwable {
 		Object[] handlerArgs;
 		if (method.getParameterTypes().length == 1) {

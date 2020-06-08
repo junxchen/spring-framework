@@ -1971,6 +1971,7 @@ public abstract class AbstractAopProxyTests {
 	@SuppressWarnings("serial")
 	public static class CountingThrowsAdvice extends MethodCounter implements ThrowsAdvice {
 
+		// 根据异常名称统计异常次数
 		public void afterThrowing(IOException ex) throws Throwable {
 			count(IOException.class.getName());
 		}

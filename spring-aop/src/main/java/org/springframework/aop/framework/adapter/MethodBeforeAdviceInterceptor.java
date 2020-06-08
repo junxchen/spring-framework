@@ -50,6 +50,12 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 	}
 
 
+	/**
+	 * 是拦截器的回调方法，会在代理对象的方法被调用时触发回调
+	 * @param mi
+	 * @return
+	 * @throws Throwable
+	 */
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
