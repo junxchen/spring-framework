@@ -40,6 +40,8 @@ import org.springframework.context.ApplicationContext;
  * @author Juergen Hoeller
  * @since January 19, 2001
  * @see ServletContextAware#setServletContext
+ *
+ * Web环境下的Spring会使用WebApplicationContext实现作为IoC容器 -> XmlWebApplicationContext
  */
 public interface WebApplicationContext extends ApplicationContext {
 
@@ -50,6 +52,8 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * lookup of the root WebApplicationContext.
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#getWebApplicationContext
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#getRequiredWebApplicationContext
+	 *
+	 * 用于在ServletContext中存取根上下文
 	 */
 	String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getName() + ".ROOT";
 
@@ -105,6 +109,7 @@ public interface WebApplicationContext extends ApplicationContext {
 	/**
 	 * Return the standard Servlet API ServletContext for this application.
 	 * <p>Also available for a Portlet application, in addition to the PortletContext.
+	 * 得到当前Web容器的Servlet上下文环境，通过这个方法，相当于提供了一个Web容器级别的全局环境
 	 */
 	ServletContext getServletContext();
 

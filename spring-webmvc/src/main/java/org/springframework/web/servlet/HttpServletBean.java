@@ -149,7 +149,18 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			logger.debug("Initializing servlet '" + getServletName() + "'");
 		}
 
+		//<servlet>
+		//    <servlet-name>DispatcherServlet</servlet-name>
+		//    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		//    <init-param>
+		//      <param-name>contextConfigLocation</param-name>
+		//      <param-value>/WEB-INF/spring-mvc.xml</param-value>
+		//    </init-param>
+		//    <load-on-startup>1</load-on-startup>
+		//  </servlet>
+
 		// Set bean properties from init parameters.
+		// 读取配置在ServletContext中的Bean属性参数，这些参数是设置在web.xml的Web容器初始化参数中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {

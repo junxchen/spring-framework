@@ -152,6 +152,10 @@ import org.springframework.web.util.WebUtils;
  * @see org.springframework.web.HttpRequestHandler
  * @see org.springframework.web.servlet.mvc.Controller
  * @see org.springframework.web.context.ContextLoaderListener
+ *
+ * 会建立自己的上下文来持有Spring MVC的Bean对象，在建立这个自己持有的IoC容器时，
+ * 会从ServletContext中得到根上下文(XmlWebApplicationContext)作为DispatcherServlet持有上下文的双亲上下文。
+ * 最后也会把自己持有的这个上下文保存到ServletContext中，供以后检索和使用。
  */
 @SuppressWarnings("serial")
 public class DispatcherServlet extends FrameworkServlet {
@@ -570,6 +574,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
 
+		// 导入所有的HandleMapping Bean，这些Bean可能在DispatcherServlet的IoC容器，也可能在双亲上下文中
 		if (this.detectAllHandlerMappings) {
 			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
 			Map<String, HandlerMapping> matchingBeans =
@@ -580,6 +585,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				AnnotationAwareOrderComparator.sort(this.handlerMappings);
 			}
 		}
+		// 根据名称从当前IoC容器中通过getBean获取handlerMapping
 		else {
 			try {
 				HandlerMapping hm = context.getBean(HANDLER_MAPPING_BEAN_NAME, HandlerMapping.class);
@@ -592,6 +598,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		// Ensure we have at least one HandlerMapping, by registering
 		// a default HandlerMapping if no other mappings are found.
+		// 没有找到handlerMappings，那么需要加载默认的handlerMapping，这些是配置在DispatcherServlet.properties中
 		if (this.handlerMappings == null) {
 			this.handlerMappings = getDefaultStrategies(context, HandlerMapping.class);
 			if (logger.isDebugEnabled()) {

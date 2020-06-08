@@ -58,6 +58,9 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @see org.springframework.web.context.ContextLoader#initWebApplicationContext
  * @see org.springframework.web.servlet.FrameworkServlet#initWebApplicationContext
+ *
+ * 在基本的ApplicationContext功能基础上，增加了对Web环境和XML环境定义的处理。
+ * 在XmlWebApplicationContext的初始化过程中，Web容器中的IoC容器被建立起来，从而在Web容器中建立起整个Spring应用。
  */
 public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationContext {
 
@@ -131,6 +134,8 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * The default location for the root context is "/WEB-INF/applicationContext.xml",
 	 * and "/WEB-INF/test-servlet.xml" for a context with the namespace "test-servlet"
 	 * (like for a DispatcherServlet instance with the servlet-name "test").
+	 *
+	 * 获取Resource位置，使用设定的默认配置位置
 	 */
 	@Override
 	protected String[] getDefaultConfigLocations() {

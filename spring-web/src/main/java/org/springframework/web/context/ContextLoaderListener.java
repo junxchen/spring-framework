@@ -37,6 +37,13 @@ import javax.servlet.ServletContextListener;
  * @see #setContextInitializers
  * @see org.springframework.web.WebApplicationInitializer
  * @see org.springframework.web.util.Log4jConfigListener
+ *
+ * ContextLoaderListener启动的上下文为根上下文。在根上下文的基础上，还有一个与Web MVC相关的上下文用来保存控制器(DispatcherServlet)
+ * 需要的MVC对象，作为根上下文的子上下文，构成一个层次化的上下文体系。
+ *
+ * 在Web容器中启动Spring应用程序时，首先建立根上下文，然后建立这个上下文体系的，这个上下文体系的建立是由ContextLoder来完成的
+ *
+ * ContextLoaderListener是Spring提供在Web容器中建立IoC容器服务的
  */
 public class ContextLoaderListener extends ContextLoader implements ServletContextListener {
 
