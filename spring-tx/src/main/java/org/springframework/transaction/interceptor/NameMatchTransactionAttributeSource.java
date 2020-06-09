@@ -71,15 +71,20 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	 * parsable into TransactionAttribute instances via TransactionAttributeEditor.
 	 * @see #setNameMap
 	 * @see TransactionAttributeEditor
+	 *
+	 * 设置配置的事务方法
 	 */
 	public void setProperties(Properties transactionAttributes) {
 		TransactionAttributeEditor tae = new TransactionAttributeEditor();
 		Enumeration<?> propNames = transactionAttributes.propertyNames();
 		while (propNames.hasMoreElements()) {
+			// 事务方法名
 			String methodName = (String) propNames.nextElement();
+			// 事务属性
 			String value = transactionAttributes.getProperty(methodName);
 			tae.setAsText(value);
 			TransactionAttribute attr = (TransactionAttribute) tae.getValue();
+			// 加入到nameMap
 			addTransactionalMethod(methodName, attr);
 		}
 	}
@@ -112,6 +117,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 		if (attr == null) {
 			// Look for most specific name match.
 			String bestNameMatch = null;
+			// 遍历所有的方法名 进行命名模式上的匹配 save*，update*
 			for (String mappedName : this.nameMap.keySet()) {
 				if (isMatch(methodName, mappedName) &&
 						(bestNameMatch == null || bestNameMatch.length() <= mappedName.length())) {

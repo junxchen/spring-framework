@@ -28,6 +28,8 @@ import org.springframework.util.ObjectUtils;
  *
  * @author Juergen Hoeller
  * @since 2.5.5
+ *
+ * 判断当前的目标方法调用是不是一个配置好的并且需要进行事务处理的方法调用
  */
 @SuppressWarnings("serial")
 abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
@@ -37,6 +39,7 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 		if (targetClass != null && TransactionalProxy.class.isAssignableFrom(targetClass)) {
 			return false;
 		}
+		// 事务方法的属性配置，根据方法调用的Method对象和目标对象，对是否需要启动事务处理拦截器进行判断
 		TransactionAttributeSource tas = getTransactionAttributeSource();
 		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
 	}

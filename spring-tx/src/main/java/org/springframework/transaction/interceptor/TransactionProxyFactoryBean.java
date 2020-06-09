@@ -110,11 +110,14 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @see #setTransactionAttributes
  * @see TransactionInterceptor
  * @see org.springframework.aop.framework.ProxyFactoryBean
+ *
+ * 生成Proxy代理对象
  */
 @SuppressWarnings("serial")
 public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBean
 		implements BeanFactoryAware {
 
+	// 通过TransactionInterceptor来完成对代理方法的拦截
 	private final TransactionInterceptor transactionInterceptor = new TransactionInterceptor();
 
 	private Pointcut pointcut;
@@ -124,6 +127,8 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	 * Set the default transaction manager. This will perform actual
 	 * transaction management: This class is just a way of invoking it.
 	 * @see TransactionInterceptor#setTransactionManager
+	 *
+	 * 通过依赖注入的PlatformTransactionManager
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionInterceptor.setTransactionManager(transactionManager);
@@ -141,6 +146,8 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 	 * @see TransactionInterceptor#setTransactionAttributes
 	 * @see TransactionAttributeEditor
 	 * @see NameMatchTransactionAttributeSource
+	 *
+	 * 通过依赖注入的事务属性以Properties形式出现，把从BeanDefinition中读到的事务管理的属性信息注入到TransactionInterceptor中
 	 */
 	public void setTransactionAttributes(Properties transactionAttributes) {
 		this.transactionInterceptor.setTransactionAttributes(transactionAttributes);
@@ -187,15 +194,19 @@ public class TransactionProxyFactoryBean extends AbstractSingletonProxyFactoryBe
 
 	/**
 	 * Creates an advisor for this FactoryBean's TransactionInterceptor.
+	 *
+	 * 创建Spring AOP对事务处理的Advisor
 	 */
 	@Override
 	protected Object createMainInterceptor() {
 		this.transactionInterceptor.afterPropertiesSet();
 		if (this.pointcut != null) {
+			// 使用默认的通知器DefaultPointcutAdvisor，并为通知器配置事务处理拦截器
 			return new DefaultPointcutAdvisor(this.pointcut, this.transactionInterceptor);
 		}
 		else {
 			// Rely on default pointcut.
+			// 没有配置pointcut，使用TransactionAttributeSourceAdvisor作为通知器，并为通知器配置事务处理拦截器
 			return new TransactionAttributeSourceAdvisor(this.transactionInterceptor);
 		}
 	}

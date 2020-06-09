@@ -132,6 +132,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 	@Override
 	public void afterPropertiesSet() {
+		// 必须配置target属性，同时需要target是一个bean reference
 		if (this.target == null) {
 			throw new IllegalArgumentException("Property 'target' is required");
 		}
@@ -142,6 +143,8 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 			this.proxyClassLoader = ClassUtils.getDefaultClassLoader();
 		}
 
+		// TransactionProxyFactoryBean使用ProxyFactory完成AOP的基本功能
+		// ProxyFactory提供Proxy对象，并将TransactionInterceptor设置为target方法调用的拦截器
 		ProxyFactory proxyFactory = new ProxyFactory();
 
 		if (this.preInterceptors != null) {
@@ -151,6 +154,8 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 
 		// Add the main interceptor (typically an Advisor).
+		// Spring加入通知器的地方，可以加入两种通知器，分别是DefaultPointcutAdvisor和TransactionAttributeSourceAdvisor
+		// 调用createMainInterceptor()来生成需要的Advisor
 		proxyFactory.addAdvisor(this.advisorAdapterRegistry.wrap(createMainInterceptor()));
 
 		if (this.postInterceptors != null) {
@@ -161,6 +166,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 		proxyFactory.copyFrom(this);
 
+		// 创建AOP的目标源
 		TargetSource targetSource = createTargetSource(this.target);
 		proxyFactory.setTargetSource(targetSource);
 
@@ -169,12 +175,14 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 		}
 		else if (!isProxyTargetClass()) {
 			// Rely on AOP infrastructure to tell us what interfaces to proxy.
+			// 根据AOP基础设施确定使用哪个接口作为代理
 			proxyFactory.setInterfaces(
 					ClassUtils.getAllInterfacesForClass(targetSource.getTargetClass(), this.proxyClassLoader));
 		}
 
 		postProcessProxyFactory(proxyFactory);
 
+		// 设置代理对象
 		this.proxy = proxyFactory.getProxy(this.proxyClassLoader);
 	}
 
@@ -205,6 +213,7 @@ public abstract class AbstractSingletonProxyFactoryBean extends ProxyConfig
 
 	@Override
 	public Object getObject() {
+		// 返回的是一个Proxy，这个Proxy是ProxyFactory生成的AOP代理，已经封装了对事务处理的拦截器
 		if (this.proxy == null) {
 			throw new FactoryBeanNotInitializedException();
 		}

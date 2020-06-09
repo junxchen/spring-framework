@@ -38,11 +38,14 @@ import org.springframework.aop.support.AbstractPointcutAdvisor;
 @SuppressWarnings("serial")
 public class TransactionAttributeSourceAdvisor extends AbstractPointcutAdvisor {
 
+	// 拦截器
 	private TransactionInterceptor transactionInterceptor;
 
+	// 切点
 	private final TransactionAttributeSourcePointcut pointcut = new TransactionAttributeSourcePointcut() {
 		@Override
 		protected TransactionAttributeSource getTransactionAttributeSource() {
+			// 获取TransactionInterceptor的TransactionAttributeSource
 			return (transactionInterceptor != null ? transactionInterceptor.getTransactionAttributeSource() : null);
 		}
 	};
