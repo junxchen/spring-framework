@@ -394,8 +394,10 @@ public class HibernateTemplate extends HibernateAccessor implements HibernateOpe
 
 		Assert.notNull(action, "Callback object must not be null");
 
+		// 获取session，判断是否强制需要新的session，如果需要就通过SessionFactory创建新的Session，否则需要结合配置和当前Transaction的情况来使用Session
 		Session session = (enforceNewSession ?
 				SessionFactoryUtils.getNewSession(getSessionFactory(), getEntityInterceptor()) : getSession());
+		// 判断Transaction是否存在，存在就使用Transaction的Session
 		boolean existingTransaction = (!enforceNewSession &&
 				(!isAllowCreate() || SessionFactoryUtils.isSessionTransactional(session, getSessionFactory())));
 		if (existingTransaction) {
@@ -408,7 +410,9 @@ public class HibernateTemplate extends HibernateAccessor implements HibernateOpe
 			enableFilters(session);
 			Session sessionToExpose =
 					(enforceNativeSession || isExposeNativeSession() ? session : createSessionProxy(session));
+			// 执行回调函数
 			T result = action.doInHibernate(sessionToExpose);
+			// 内存与数据库同步
 			flushIfNecessary(session, existingTransaction);
 			return result;
 		}
@@ -423,6 +427,7 @@ public class HibernateTemplate extends HibernateAccessor implements HibernateOpe
 			throw ex;
 		}
 		finally {
+			// 存在Transaction，那么当前的回调使用完Session后，不关闭Session
 			if (existingTransaction) {
 				logger.debug("Not closing pre-bound Hibernate Session after HibernateTemplate");
 				disableFilters(session);
@@ -975,8 +980,10 @@ public class HibernateTemplate extends HibernateAccessor implements HibernateOpe
 		return executeWithNativeSession(new HibernateCallback<List<?>>() {
 			@Override
 			public List<?> doInHibernate(Session session) throws HibernateException {
+				// 使用Session创建Hibernate的Query
 				Query queryObject = session.createQuery(queryString);
 				prepareQuery(queryObject);
+				// 为query配置参数
 				if (values != null) {
 					for (int i = 0; i < values.length; i++) {
 						queryObject.setParameter(i, values[i]);

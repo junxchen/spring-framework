@@ -188,6 +188,7 @@ public abstract class AbstractSessionFactoryBean extends HibernateExceptionTrans
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		// 通过配置信息得到SessionFactory
 		SessionFactory rawSf = buildSessionFactory();
 		this.sessionFactory = wrapSessionFactoryIfNecessary(rawSf);
 		afterSessionFactoryCreation();

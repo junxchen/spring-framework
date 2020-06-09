@@ -103,6 +103,8 @@ import org.springframework.util.StringUtils;
  * @see org.hibernate.SessionFactory#getCurrentSession()
  * @see HibernateTransactionManager
  * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
+ *
+ * 对Hibernate的Session进行管理
  */
 @Deprecated
 public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implements BeanClassLoaderAware {
@@ -517,6 +519,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 		}
 		if (this.cacheRegionFactory != null) {
 			// Make Spring-provided Hibernate RegionFactory available.
+			// 设置Hibernate的缓存提供器
 			configTimeRegionFactoryHolder.set(this.cacheRegionFactory);
 		}
 		if (this.lobHandler != null) {
@@ -528,6 +531,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 		// Analogous to Hibernate EntityManager's Ejb3Configuration:
 		// Hibernate doesn't allow setting the bean ClassLoader explicitly,
 		// so we need to expose it as thread context ClassLoader accordingly.
+		// Hibernate不允许直接设置Bean的ClassLoader，需要通过线程方式实现
 		Thread currentThread = Thread.currentThread();
 		ClassLoader threadContextClassLoader = currentThread.getContextClassLoader();
 		boolean overrideClassLoader =
@@ -536,6 +540,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 			currentThread.setContextClassLoader(this.beanClassLoader);
 		}
 
+		// 对Hibernate的各个属性进行配置，这里通过Hibernate的Configuration来实现配置
 		try {
 			if (isExposeTransactionAwareSessionFactory()) {
 				// Set Hibernate 3.1+ CurrentSessionContext implementation,
@@ -587,6 +592,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 			if (this.configLocations != null) {
 				for (Resource resource : this.configLocations) {
 					// Load Hibernate configuration from given location.
+					// 载入Hibernate的配置信息，该配置信息在指定的资源位置
 					config.configure(resource.getURL());
 				}
 			}
@@ -656,6 +662,7 @@ public class LocalSessionFactoryBean extends AbstractSessionFactoryBean implemen
 
 			// Tell Hibernate to eagerly compile the mappings that we registered,
 			// for availability of the mapping information in further processing.
+			// 编译Hibernate需要的mapping信息
 			postProcessMappings(config);
 			config.buildMappings();
 
