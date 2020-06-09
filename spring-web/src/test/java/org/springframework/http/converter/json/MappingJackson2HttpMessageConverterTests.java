@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -64,12 +64,16 @@ public class MappingJackson2HttpMessageConverterTests {
 	public void canRead() {
 		assertThat(converter.canRead(MyBean.class, new MediaType("application", "json"))).isTrue();
 		assertThat(converter.canRead(Map.class, new MediaType("application", "json"))).isTrue();
+		assertThat(converter.canRead(MyBean.class, new MediaType("application", "json", StandardCharsets.UTF_8))).isTrue();
+		assertThat(converter.canRead(MyBean.class, new MediaType("application", "json", StandardCharsets.ISO_8859_1))).isFalse();
 	}
 
 	@Test
 	public void canWrite() {
 		assertThat(converter.canWrite(MyBean.class, new MediaType("application", "json"))).isTrue();
 		assertThat(converter.canWrite(Map.class, new MediaType("application", "json"))).isTrue();
+		assertThat(converter.canWrite(MyBean.class, new MediaType("application", "json", StandardCharsets.UTF_8))).isTrue();
+		assertThat(converter.canWrite(MyBean.class, new MediaType("application", "json", StandardCharsets.ISO_8859_1))).isFalse();
 	}
 
 	@Test  // SPR-7905
@@ -455,10 +459,12 @@ public class MappingJackson2HttpMessageConverterTests {
 
 		private String string;
 
+		@Override
 		public String getString() {
 			return string;
 		}
 
+		@Override
 		public void setString(String string) {
 			this.string = string;
 		}

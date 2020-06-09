@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -66,7 +66,7 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 		BlockingSession session = new BlockingSession();
 		session.setOpen(true);
 
-		final ConcurrentWebSocketSessionDecorator decorator =
+		ConcurrentWebSocketSessionDecorator decorator =
 				new ConcurrentWebSocketSessionDecorator(session, 10 * 1000, 1024);
 
 		sendBlockingMessage(decorator);
@@ -91,7 +91,7 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 		session.setId("123");
 		session.setOpen(true);
 
-		final ConcurrentWebSocketSessionDecorator decorator =
+		ConcurrentWebSocketSessionDecorator decorator =
 				new ConcurrentWebSocketSessionDecorator(session, 100, 1024);
 
 		sendBlockingMessage(decorator);
@@ -113,17 +113,13 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 		session.setId("123");
 		session.setOpen(true);
 
-		final ConcurrentWebSocketSessionDecorator decorator =
+		ConcurrentWebSocketSessionDecorator decorator =
 				new ConcurrentWebSocketSessionDecorator(session, 10*1000, 1024);
 
 		sendBlockingMessage(decorator);
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0 ; i < 1023; i++) {
-			sb.append("a");
-		}
-
-		TextMessage message = new TextMessage(sb.toString());
+		String msg = String.format("%1023s", "a");
+		TextMessage message = new TextMessage(msg);
 		decorator.sendMessage(message);
 
 		assertThat(decorator.getBufferSize()).isEqualTo(1023);
@@ -142,24 +138,20 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 		session.setId("123");
 		session.setOpen(true);
 
-		final ConcurrentWebSocketSessionDecorator decorator =
+		ConcurrentWebSocketSessionDecorator decorator =
 				new ConcurrentWebSocketSessionDecorator(session, 10*1000, 1024, OverflowStrategy.DROP);
 
 		sendBlockingMessage(decorator);
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0 ; i < 1023; i++) {
-			sb.append("a");
-		}
+		String msg = String.format("%1023s", "a");
 
-		for (int i=0; i < 5; i++) {
-			TextMessage message = new TextMessage(sb.toString());
+		for (int i = 0; i < 5; i++) {
+			TextMessage message = new TextMessage(msg);
 			decorator.sendMessage(message);
 		}
 
 		assertThat(decorator.getBufferSize()).isEqualTo(1023);
 		assertThat(session.isOpen()).isTrue();
-
 	}
 
 	@Test
@@ -187,7 +179,7 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 		int sendTimeLimit = 100;
 		int bufferSizeLimit = 1024;
 
-		final ConcurrentWebSocketSessionDecorator decorator =
+		ConcurrentWebSocketSessionDecorator decorator =
 				new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferSizeLimit);
 
 		Executors.newSingleThreadExecutor().submit((Runnable) () -> {
@@ -211,6 +203,8 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 	}
 
 	private void sendBlockingMessage(ConcurrentWebSocketSessionDecorator session) throws InterruptedException {
+		BlockingSession delegate = (BlockingSession) session.getDelegate();
+		CountDownLatch sentMessageLatch = delegate.getSentMessageLatch();
 		Executors.newSingleThreadExecutor().submit(() -> {
 			TextMessage message = new TextMessage("slow message");
 			try {
@@ -220,17 +214,16 @@ public class ConcurrentWebSocketSessionDecoratorTests {
 				e.printStackTrace();
 			}
 		});
-		BlockingSession delegate = (BlockingSession) session.getDelegate();
-		assertThat(delegate.getSentMessageLatch().await(5, TimeUnit.SECONDS)).isTrue();
+		assertThat(sentMessageLatch.await(5, TimeUnit.SECONDS)).isTrue();
 	}
 
 
 
 	private static class BlockingSession extends TestWebSocketSession {
 
-		private AtomicReference<CountDownLatch> nextMessageLatch = new AtomicReference<>();
+		private final AtomicReference<CountDownLatch> nextMessageLatch = new AtomicReference<>();
 
-		private AtomicReference<CountDownLatch> releaseLatch = new AtomicReference<>();
+		private final AtomicReference<CountDownLatch> releaseLatch = new AtomicReference<>();
 
 
 		public CountDownLatch getSentMessageLatch() {

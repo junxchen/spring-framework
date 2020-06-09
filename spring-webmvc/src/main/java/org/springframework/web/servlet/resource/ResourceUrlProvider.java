@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -53,7 +54,7 @@ public class ResourceUrlProvider implements ApplicationListener<ContextRefreshed
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private UrlPathHelper urlPathHelper = new UrlPathHelper();
+	private UrlPathHelper urlPathHelper = UrlPathHelper.defaultInstance;
 
 	private PathMatcher pathMatcher = new AntPathMatcher();
 

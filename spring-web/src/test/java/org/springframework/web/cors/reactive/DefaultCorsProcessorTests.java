@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 package org.springframework.web.cors.reactive;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.mock.http.server.reactive.test.MockServerHttpRequest;
-import org.springframework.mock.web.test.server.MockServerWebExchange;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.testfixture.http.server.reactive.MockServerHttpRequest;
+import org.springframework.web.testfixture.server.MockServerWebExchange;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS;
@@ -48,7 +48,7 @@ public class DefaultCorsProcessorTests {
 	private CorsConfiguration conf;
 
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.conf = new CorsConfiguration();
 		this.processor = new DefaultCorsProcessor();
@@ -58,7 +58,7 @@ public class DefaultCorsProcessorTests {
 	@Test
 	public void requestWithoutOriginHeader() throws Exception {
 		MockServerHttpRequest request = MockServerHttpRequest
-				.method(HttpMethod.GET, "http://domain1.com/test.html")
+				.method(HttpMethod.GET, "http://domain1.example/test.html")
 				.build();
 		ServerWebExchange exchange = MockServerWebExchange.from(request);
 		this.processor.process(this.conf, exchange);
@@ -73,8 +73,8 @@ public class DefaultCorsProcessorTests {
 	@Test
 	public void sameOriginRequest() throws Exception {
 		MockServerHttpRequest request = MockServerHttpRequest
-				.method(HttpMethod.GET, "http://domain1.com/test.html")
-				.header(HttpHeaders.ORIGIN, "http://domain1.com")
+				.method(HttpMethod.GET, "http://domain1.example/test.html")
+				.header(HttpHeaders.ORIGIN, "http://domain1.example")
 				.build();
 		ServerWebExchange exchange = MockServerWebExchange.from(request);
 		this.processor.process(this.conf, exchange);
@@ -129,7 +129,7 @@ public class DefaultCorsProcessorTests {
 		ServerWebExchange exchange = actualRequest();
 		this.conf.addAllowedOrigin("https://domain1.com");
 		this.conf.addAllowedOrigin("https://domain2.com");
-		this.conf.addAllowedOrigin("http://domain3.com");
+		this.conf.addAllowedOrigin("http://domain3.example");
 		this.conf.setAllowCredentials(true);
 		this.processor.process(this.conf, exchange);
 
@@ -306,7 +306,7 @@ public class DefaultCorsProcessorTests {
 
 		this.conf.addAllowedOrigin("https://domain1.com");
 		this.conf.addAllowedOrigin("https://domain2.com");
-		this.conf.addAllowedOrigin("http://domain3.com");
+		this.conf.addAllowedOrigin("http://domain3.example");
 		this.conf.addAllowedHeader("Header1");
 		this.conf.setAllowCredentials(true);
 
@@ -330,7 +330,7 @@ public class DefaultCorsProcessorTests {
 
 		this.conf.addAllowedOrigin("https://domain1.com");
 		this.conf.addAllowedOrigin("*");
-		this.conf.addAllowedOrigin("http://domain3.com");
+		this.conf.addAllowedOrigin("http://domain3.example");
 		this.conf.addAllowedHeader("Header1");
 		this.conf.setAllowCredentials(true);
 
@@ -419,6 +419,25 @@ public class DefaultCorsProcessorTests {
 		ServerHttpResponse response = exchange.getResponse();
 		assertThat(response.getHeaders().containsKey(ACCESS_CONTROL_ALLOW_ORIGIN)).isFalse();
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+
+	@Test
+	public void preventDuplicatedVaryHeaders() {
+		MockServerHttpRequest request = MockServerHttpRequest
+				.method(HttpMethod.GET, "http://domain1.example/test.html")
+				.header(HttpHeaders.ORIGIN, "http://domain1.example")
+				.build();
+		ServerWebExchange exchange = MockServerWebExchange.from(request);
+		ServerHttpResponse response = exchange.getResponse();
+		HttpHeaders responseHeaders = response.getHeaders();
+		responseHeaders.add(VARY, ORIGIN);
+		responseHeaders.add(VARY, ACCESS_CONTROL_REQUEST_METHOD);
+		responseHeaders.add(VARY, ACCESS_CONTROL_REQUEST_HEADERS);
+
+		this.processor.process(this.conf, exchange);
+
+		assertThat(responseHeaders.get(VARY)).containsOnlyOnce(ORIGIN,
+				ACCESS_CONTROL_REQUEST_METHOD, ACCESS_CONTROL_REQUEST_HEADERS);
 	}
 
 

@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -50,6 +50,8 @@ public class MappingJackson2XmlHttpMessageConverterTests {
 		assertThat(converter.canRead(MyBean.class, new MediaType("application", "xml"))).isTrue();
 		assertThat(converter.canRead(MyBean.class, new MediaType("text", "xml"))).isTrue();
 		assertThat(converter.canRead(MyBean.class, new MediaType("application", "soap+xml"))).isTrue();
+		assertThat(converter.canRead(MyBean.class, new MediaType("text", "xml", StandardCharsets.UTF_8))).isTrue();
+		assertThat(converter.canRead(MyBean.class, new MediaType("text", "xml", StandardCharsets.ISO_8859_1))).isFalse();
 	}
 
 	@Test
@@ -57,6 +59,8 @@ public class MappingJackson2XmlHttpMessageConverterTests {
 		assertThat(converter.canWrite(MyBean.class, new MediaType("application", "xml"))).isTrue();
 		assertThat(converter.canWrite(MyBean.class, new MediaType("text", "xml"))).isTrue();
 		assertThat(converter.canWrite(MyBean.class, new MediaType("application", "soap+xml"))).isTrue();
+		assertThat(converter.canWrite(MyBean.class, new MediaType("text", "xml", StandardCharsets.UTF_8))).isTrue();
+		assertThat(converter.canWrite(MyBean.class, new MediaType("text", "xml", StandardCharsets.ISO_8859_1))).isFalse();
 	}
 
 	@Test

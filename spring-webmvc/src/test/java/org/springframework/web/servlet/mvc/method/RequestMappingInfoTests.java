@@ -19,13 +19,14 @@ package org.springframework.web.servlet.mvc.method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.mock.web.test.MockHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.testfixture.servlet.MockHttpServletRequest;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,16 +44,35 @@ public class RequestMappingInfoTests {
 
 	@Test
 	public void createEmpty() {
+
 		RequestMappingInfo info = paths().build();
 
 		// gh-22543
 		assertThat(info.getPatternsCondition().getPatterns()).isEqualTo(Collections.singleton(""));
 		assertThat(info.getMethodsCondition().getMethods().size()).isEqualTo(0);
-		assertThat(info.getConsumesCondition().isEmpty()).isEqualTo(true);
-		assertThat(info.getProducesCondition().isEmpty()).isEqualTo(true);
 		assertThat(info.getParamsCondition()).isNotNull();
 		assertThat(info.getHeadersCondition()).isNotNull();
+		assertThat(info.getConsumesCondition().isEmpty()).isEqualTo(true);
+		assertThat(info.getProducesCondition().isEmpty()).isEqualTo(true);
 		assertThat(info.getCustomCondition()).isNull();
+
+		RequestMappingInfo anotherInfo = paths().build();
+		assertThat(info.getPatternsCondition()).isSameAs(anotherInfo.getPatternsCondition());
+		assertThat(info.getMethodsCondition()).isSameAs(anotherInfo.getMethodsCondition());
+		assertThat(info.getParamsCondition()).isSameAs(anotherInfo.getParamsCondition());
+		assertThat(info.getHeadersCondition()).isSameAs(anotherInfo.getHeadersCondition());
+		assertThat(info.getConsumesCondition()).isSameAs(anotherInfo.getConsumesCondition());
+		assertThat(info.getProducesCondition()).isSameAs(anotherInfo.getProducesCondition());
+		assertThat(info.getCustomCondition()).isSameAs(anotherInfo.getCustomCondition());
+
+		RequestMappingInfo result = info.combine(anotherInfo);
+		assertThat(info.getPatternsCondition()).isSameAs(result.getPatternsCondition());
+		assertThat(info.getMethodsCondition()).isSameAs(result.getMethodsCondition());
+		assertThat(info.getParamsCondition()).isSameAs(result.getParamsCondition());
+		assertThat(info.getHeadersCondition()).isSameAs(result.getHeadersCondition());
+		assertThat(info.getConsumesCondition()).isSameAs(result.getConsumesCondition());
+		assertThat(info.getProducesCondition()).isSameAs(result.getProducesCondition());
+		assertThat(info.getCustomCondition()).isSameAs(result.getCustomCondition());
 	}
 
 	@Test
