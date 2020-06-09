@@ -254,6 +254,8 @@ public abstract class TransactionSynchronizationManager {
 	/**
 	 * Return if transaction synchronization is active for the current thread.
 	 * Can be called before register to avoid unnecessary instance creation.
+	 *
+	 * 如果当前事务是同步活动状态，在注册之前避免不必要的实例创建
 	 * @see #registerSynchronization
 	 */
 	public static boolean isSynchronizationActive() {

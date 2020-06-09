@@ -47,6 +47,8 @@ import org.springframework.util.Assert;
  * @see DataSourceTransactionManager
  * @see org.springframework.transaction.jta.JtaTransactionManager
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
+ *
+ * 数据库数据源辅助类
  */
 public abstract class DataSourceUtils {
 
@@ -74,6 +76,7 @@ public abstract class DataSourceUtils {
 	 */
 	public static Connection getConnection(DataSource dataSource) throws CannotGetJdbcConnectionException {
 		try {
+			// 获取数据库连接
 			return doGetConnection(dataSource);
 		}
 		catch (SQLException ex) {
@@ -96,6 +99,8 @@ public abstract class DataSourceUtils {
 	public static Connection doGetConnection(DataSource dataSource) throws SQLException {
 		Assert.notNull(dataSource, "No DataSource specified");
 
+		// 将数据库的Connection放到事务管理中进行管理，使用TransactionSynchronizationManager定义的ThreadLocal变量来和线程绑定数据库连接
+		// 如果在TransactionSynchronizationManager已经有了与当前线程绑定的数据库连接，那么直接取出使用
 		ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
 		if (conHolder != null && (conHolder.hasConnection() || conHolder.isSynchronizedWithTransaction())) {
 			conHolder.requested();
@@ -108,12 +113,15 @@ public abstract class DataSourceUtils {
 		// Else we either got no holder or an empty thread-bound holder here.
 
 		logger.debug("Fetching JDBC Connection from DataSource");
+		// 根据数据库用户、密码、url、驱动(类似JDBC获取连接操作)，获取需要的数据库连接
 		Connection con = dataSource.getConnection();
 
+		// 将conn通过TransactionSynchronizationManager和当前线程绑定起来
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
 			try {
 				// Use same Connection for further JDBC actions within the transaction.
 				// Thread-bound object will get removed by synchronization at transaction completion.
+				// 事务中的进一步JDBC操作，使用相同的连接，线程绑定在事务完成时通过同步删除
 				ConnectionHolder holderToUse = conHolder;
 				if (holderToUse == null) {
 					holderToUse = new ConnectionHolder(con);
@@ -121,7 +129,9 @@ public abstract class DataSourceUtils {
 				else {
 					holderToUse.setConnection(con);
 				}
+				// 统计ConnectionHolder引用数量
 				holderToUse.requested();
+
 				TransactionSynchronizationManager.registerSynchronization(
 						new ConnectionSynchronization(holderToUse, dataSource));
 				holderToUse.setSynchronizedWithTransaction(true);

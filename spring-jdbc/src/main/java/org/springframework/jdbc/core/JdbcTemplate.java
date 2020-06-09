@@ -390,6 +390,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	public <T> T execute(StatementCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
 
+		// 获取数据库的Connection，这个数据库的Connection已经在Spring的事务管理之下了
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		Statement stmt = null;
 		try {
@@ -398,12 +399,25 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 					this.nativeJdbcExtractor.isNativeConnectionNecessaryForNativeStatements()) {
 				conToUse = this.nativeJdbcExtractor.getNativeConnection(con);
 			}
+			// 创建Statement语句
 			stmt = conToUse.createStatement();
 			applyStatementSettings(stmt);
 			Statement stmtToUse = stmt;
 			if (this.nativeJdbcExtractor != null) {
 				stmtToUse = this.nativeJdbcExtractor.getNativeStatement(stmt);
 			}
+			// 调用回调函数
+			// class ExecuteStatementCallback implements StatementCallback<Object>, SqlProvider {
+			//			@Override
+			//			public Object doInStatement(Statement stmt) throws SQLException {
+			//				stmt.execute(sql);
+			//				return null;
+			//			}
+			//			@Override
+			//			public String getSql() {
+			//				return sql;
+			//			}
+			//		}
 			T result = action.doInStatement(stmtToUse);
 			handleWarnings(stmt);
 			return result;
@@ -411,6 +425,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		catch (SQLException ex) {
 			// Release Connection early, to avoid potential connection pool deadlock
 			// in the case when the exception translator hasn't been initialized yet.
+			// 释放Connection，抛出经过Spring转换过的Spring数据库异常
 			JdbcUtils.closeStatement(stmt);
 			stmt = null;
 			DataSourceUtils.releaseConnection(con, getDataSource());
@@ -621,6 +636,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			logger.debug("Executing prepared SQL statement" + (sql != null ? " [" + sql + "]" : ""));
 		}
 
+		// 获取数据库连接
 		Connection con = DataSourceUtils.getConnection(getDataSource());
 		PreparedStatement ps = null;
 		try {
@@ -629,12 +645,14 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 					this.nativeJdbcExtractor.isNativeConnectionNecessaryForNativePreparedStatements()) {
 				conToUse = this.nativeJdbcExtractor.getNativeConnection(con);
 			}
+			// 创建PreparedStatement语句
 			ps = psc.createPreparedStatement(conToUse);
 			applyStatementSettings(ps);
 			PreparedStatement psToUse = ps;
 			if (this.nativeJdbcExtractor != null) {
 				psToUse = this.nativeJdbcExtractor.getNativePreparedStatement(ps);
 			}
+			// 调用回调函数PreparedStatementCallback
 			T result = action.doInPreparedStatement(psToUse);
 			handleWarnings(ps);
 			return result;
@@ -688,19 +706,23 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		return execute(psc, new PreparedStatementCallback<T>() {
 			@Override
 			public T doInPreparedStatement(PreparedStatement ps) throws SQLException {
+				// 查询结果集
 				ResultSet rs = null;
 				try {
 					if (pss != null) {
 						pss.setValues(ps);
 					}
+					// 执行SQL查询
 					rs = ps.executeQuery();
 					ResultSet rsToUse = rs;
 					if (nativeJdbcExtractor != null) {
 						rsToUse = nativeJdbcExtractor.getNativeResultSet(rs);
 					}
+					// 返回需要的结果集合
 					return rse.extractData(rsToUse);
 				}
 				finally {
+					// 关闭查询的记录结果集
 					JdbcUtils.closeResultSet(rs);
 					if (pss instanceof ParameterDisposer) {
 						((ParameterDisposer) pss).cleanupParameters();
