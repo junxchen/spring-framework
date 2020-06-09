@@ -434,8 +434,10 @@ public class HibernateTransactionManager extends AbstractPlatformTransactionMana
 	@Override
 	protected Object doGetTransaction() {
 		HibernateTransactionObject txObject = new HibernateTransactionObject();
+		// 是否允许嵌套事务
 		txObject.setSavepointAllowed(isNestedTransactionAllowed());
 
+		// 从线程中取得SessionHolder，这个SessionHolder是在事务开始时与线程绑定的
 		SessionHolder sessionHolder =
 				(SessionHolder) TransactionSynchronizationManager.getResource(getSessionFactory());
 		if (sessionHolder != null) {
@@ -491,17 +493,21 @@ public class HibernateTransactionManager extends AbstractPlatformTransactionMana
 		Session session = null;
 
 		try {
+			// SessionHolder不存在，创建SessionHolder
 			if (txObject.getSessionHolder() == null || txObject.getSessionHolder().isSynchronizedWithTransaction()) {
 				Interceptor entityInterceptor = getEntityInterceptor();
+				// 获取session
 				Session newSession = (entityInterceptor != null ?
 						getSessionFactory().openSession(entityInterceptor) : getSessionFactory().openSession());
 				if (logger.isDebugEnabled()) {
 					logger.debug("Opened new Session [" + SessionFactoryUtils.toString(newSession) +
 							"] for Hibernate transaction");
 				}
+				// 创建SessionHolder
 				txObject.setSession(newSession);
 			}
 
+			// 获取session，为创建HibernateTransactionManager作准备
 			session = txObject.getSessionHolder().getSession();
 
 			if (this.prepareConnection && isSameConnectionForEntireSession(session)) {
@@ -548,6 +554,7 @@ public class HibernateTransactionManager extends AbstractPlatformTransactionMana
 			Transaction hibTx;
 
 			// Register transaction timeout.
+			// 为Hibernate的Transaction设置超时时间，并开始事务
 			int timeout = determineTimeout(definition);
 			if (timeout != TransactionDefinition.TIMEOUT_DEFAULT) {
 				// Use Hibernate's own transaction timeout mechanism on Hibernate 3.1+
@@ -582,6 +589,7 @@ public class HibernateTransactionManager extends AbstractPlatformTransactionMana
 			if (txObject.isNewSessionHolder()) {
 				TransactionSynchronizationManager.bindResource(getSessionFactory(), txObject.getSessionHolder());
 			}
+			// 在SessionHolder中进行状态标志，标识事务已经开始
 			txObject.getSessionHolder().setSynchronizedWithTransaction(true);
 		}
 
