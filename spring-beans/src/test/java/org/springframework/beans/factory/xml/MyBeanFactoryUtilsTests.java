@@ -45,13 +45,13 @@ public final class MyBeanFactoryUtilsTests {
 
         this.dependentBeansFactory = new DefaultListableBeanFactory();
         new XmlBeanDefinitionReader(this.dependentBeansFactory).loadBeanDefinitions(DEPENDENT_BEANS_CONTEXT);
-        dependentBeansFactory.preInstantiateSingletons();
+        // dependentBeansFactory.preInstantiateSingletons();
     }
 
 
     @Test
     public void test1() {
-        Object bean = dependentBeansFactory.getBean("myTestBean");
+         Object bean = dependentBeansFactory.getBean("myTestBean");
         System.out.println(bean.getClass());
     }
 
